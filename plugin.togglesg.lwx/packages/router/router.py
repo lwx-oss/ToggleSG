@@ -8,7 +8,7 @@ class Router(object):
 
     def route(self, routeKey):
         try:
+            print('[Routing to -->', routeKey, ']')
             self.routes[routeKey]()
         except KeyError:
             print('[Router] Invalid routeKey -->', routeKey)
-            

@@ -27,11 +27,17 @@ def _transformQueryStringIntoDict(queryString):
 def router():
     queryString = parse_qsl(sys.argv[2])
     d = _transformQueryStringIntoDict(queryString)
-    _router.setRoutes({
-        'search': getSearchInputValue
-    })
-    _router.route(d['action'])
 
+    action = d['action']
+
+    if action == 'search':
+        getSearchInputValue()
+    elif action == 'retrieve':
+        retrieve(d['searchTerm'])
+
+
+def retrieve(searchTerm):
+    xbmcgui.Dialog().ok('heading', searchTerm)
 
 
 def getSearchInputValue():
@@ -39,11 +45,18 @@ def getSearchInputValue():
     print(searchInputValue)
 
 
+def landing():
+    xbmcplugin.setContent(_handle, 'videos')
+    ButtonBuilder.searchButton()
+    ButtonBuilder.lastSearchItemButton('Crimewatch')
+    xbmcplugin.endOfDirectory(_handle)
+
+
+
 def main():
     if sys.argv[2] != '':
         router()
     else:
-        ButtonBuilder.searchButton()
-
+        landing()
 
 main()
