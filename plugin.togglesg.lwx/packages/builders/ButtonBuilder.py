@@ -10,7 +10,7 @@ def searchButton():
     directoryItem.title = 'Search'
     directoryItem.plot = 'Search for a show'
     directoryItem.setAction('search')
-    xbmcplugin.addDirectoryItem(_handle, directoryItem.action, directoryItem.toListItem(), False)
+    xbmcplugin.addDirectoryItem(_handle, directoryItem.action, directoryItem.toListItem(), True)
 
 
 def lastSearchItemButton(searchTerm):
@@ -20,5 +20,5 @@ def lastSearchItemButton(searchTerm):
     directoryItem.type = 'video'
     directoryItem.title = searchTerm
     directoryItem.plot = searchTerm
-    directoryItem.setAction('retrieve&searchTerm=Crimewatch')
+    directoryItem.setAction('search')
     xbmcplugin.addDirectoryItem(_handle, directoryItem.action, directoryItem.toListItem(), False)

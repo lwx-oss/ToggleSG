@@ -26,10 +26,28 @@ class DirectoryItem():
         self.title = None
         self.plot = None
         self.action = None
+        self.image = None
+
+    def setPropertiesFromItem(self, item):
+        ''' use Item() to populate properties' values '''
+        self.label = item.label
+        self.title = item.title
+        self.plot = item.plot
+        if item.type:
+            self.type = item.type
+
+        if item.image:
+            self.image = item.image
+        
+        self.setAction("resolveToSeries&URL=" + item.action)
+
+    
+    def setURLAction(self, action):
+        self.action = action
 
 
     def setAction(self, action):
-        self.action = "{}/?&action={}".format(sys.argv[0], action)
+        self.action = "{}?&action={}".format(sys.argv[0], action)
 
 
     def _isValidProperties(self):
@@ -46,5 +64,10 @@ class DirectoryItem():
             'title': self.title,
             'plot': self.plot
         })
+
+        if self.image:
+            listItem.setArt({
+                'thumb': self.image
+            })
         
         return listItem
