@@ -9,12 +9,25 @@ from packages.router import router as internalRouter
 from packages.models import DirectoryItem as ItemModel
 from packages.builders import ButtonBuilder
 from packages.builders import InputBuilder
-from packages.resolvers import resolver
+from packages.builders import ListItemBuilder
+from packages.resolvers import toggle_resolver, resolver
 
+_url = sys.argv[0]
 
 _handle = int(sys.argv[1])
 
 _router = internalRouter.Router()
+
+_screen = xbmcplugin
+
+
+# import web_pdb; web_pdb.set_trace()
+
+
+class Item():
+    def __init__(self):
+        pass
+
 
 def _transformQueryStringIntoDict(queryString):
     d = {}
@@ -30,17 +43,45 @@ def router():
     d = _transformQueryStringIntoDict(queryString)
     action = d['action']
 
-    if action == 'search':
-        getSearchInputValue()
-    elif action == 'resolveVideoURL':
-        retrieve(d['searchTerm'])
-    elif action == 'resolveToSeries':
-        listAllEpisodesOfSeries(d['URL'])
+    if action == 'getDirectLink':
+        url = d['url']
+        tr = toggle_resolver.ToggleResolver(url)
+        item = tr.buildItemDTO()
+        listItem = xbmcgui.ListItem(path=item.video)
+        listItem.setSubtitles(item.subtitles)
+        xbmcplugin.setResolvedUrl(_handle, True, listItem)
 
-def listAllEpisodesOfSeries(url):
-    episodes = resolver.resolveToEpisodesListings(url)
-    # directly resolve all episodes URL to direct link like in previous version and populate
+    elif action == 'getAllEpisodesOfSeries':
+        url = d['url']
+        resolveAllEpisodesAndShow(url)
 
+        # listItems = []
+        # for episode in episodeLinks:
+        #     item = Item()
+        #     item.name = episode
+        #     item.image = episode
+        #     item.description = episode
+        #     url = '{}?&action=getDirectLink&url={}'.format(_url, episode)
+        #     item.video = url
+        #     lib = ListItemBuilder.ListItemBuilder()
+        #     listItem = lib.buildListItemFromItem(item)
+        #     listItems.append((url, lib.buildListItemFromItem(item), False))
+
+        # _screen.setPluginCategory(_handle, 'All Episodes Of Series')
+        # _screen.setContent(_handle, 'videos')
+        # _screen.addDirectoryItems(_handle, listItems)
+        # _screen.endOfDirectory(_handle)
+
+
+def resolveAllEpisodesAndShow(url):
+    episodesInfo = resolver.getAllEpisodesOfSeries(url)
+    _screen.setPluginCategory(_handle, 'Episodes')
+    _screen.setContent(_handle, 'videos')
+    for episode in episodesInfo['episodes']:
+        tr = toggle_resolver.ToggleResolver(episode['url'])
+        _screen.addDirectoryItem(_handle, tr.getVideoURL(), tr.buildListItem(), False)
+    _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    _screen.endOfDirectory(_handle)
 
 
 def _print(content):
@@ -51,25 +92,28 @@ def retrieve(searchTerm):
     xbmcgui.Dialog().ok('heading', searchTerm)
 
 
-def getSearchInputValue():
-    searchInputValue = InputBuilder.searchInput()
-    searchResults = resolver.toggleSearch(searchInputValue)
-    items = utils.parseSearchResultsList(searchResults['list'])
-    xbmcplugin.setContent(_handle, 'videos')
-    for item in items:
-        di = ItemModel.DirectoryItem()
-        di.setPropertiesFromItem(item)
-        xbmcplugin.addDirectoryItem(_handle, di.action, di.toListItem(), False)
-    xbmcplugin.endOfDirectory(_handle, updateListing = True)
-
-
-
 def landing():
-    xbmcplugin.setContent(_handle, 'videos')
-    ButtonBuilder.searchButton()
-    ButtonBuilder.lastSearchItemButton('Crimewatch')
-    xbmcplugin.endOfDirectory(_handle, updateListing = True)
+    allSeries = resolver.getAllSeries()
+    _screen.setPluginCategory(_handle, 'All Series')
+    _screen.setContent(_handle, 'videos')
 
+    listItems = []
+
+    for series in allSeries:
+        listItem = xbmcgui.ListItem()
+        listItem.setLabel(series['title'])
+        # listItem.setArt({})
+        listItem.setInfo(
+            'video', {'title': series['title'], 'mediatype': 'video'})
+        isFolder = True
+        # needs to become a tuple (url, listItem, isFolder)
+        url = '{}?&action=getAllEpisodesOfSeries&url={}'.format(
+            _url, series['url'])
+        listItems.append((url, listItem, isFolder))
+
+    _screen.addDirectoryItems(_handle, listItems)
+    _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    _screen.endOfDirectory(_handle)
 
 
 def main():
@@ -79,5 +123,6 @@ def main():
         router()
     else:
         landing()
+
 
 main()
