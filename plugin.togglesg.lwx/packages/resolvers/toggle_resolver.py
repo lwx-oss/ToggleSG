@@ -162,6 +162,7 @@ class ToggleResolver():
         })
 
         listItem.setProperty('IsPlayable', 'true')
+        listItem.setSubtitles(self._getAllSubtitles())
 
         return listItem
 

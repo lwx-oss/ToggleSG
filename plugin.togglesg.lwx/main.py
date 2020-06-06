@@ -73,14 +73,15 @@ def resolveAllEpisodesLocally(seriesURL):
 
 def resolveAllEpisodesAndShow(url):
     # episodesInfo = resolver.getAllEpisodesOfSeries(url)
-    _screen.setPluginCategory(_handle, 'Episodes')
-    _screen.setContent(_handle, 'videos')
-    for episode in episodesInfo['episodes']:
-        tr = toggle_resolver.ToggleResolver(episode['url'])
-        _screen.addDirectoryItem(
-            _handle, tr.getVideoURL(), tr.buildListItem(), False)
-    _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
-    _screen.endOfDirectory(_handle)
+    # _screen.setPluginCategory(_handle, 'Episodes')
+    # _screen.setContent(_handle, 'videos')
+    # for episode in episodesInfo['episodes']:
+    #     tr = toggle_resolver.ToggleResolver(episode['url'])
+    #     _screen.addDirectoryItem(
+    #         _handle, tr.getVideoURL(), tr.buildListItem(), False)
+    # _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    # _screen.endOfDirectory(_handle)
+    pass
 
 
 def _print(content):
