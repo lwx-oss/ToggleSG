@@ -55,23 +55,6 @@ def router():
         url = d['url']
         resolveAllEpisodesAndShow(url)
 
-        # listItems = []
-        # for episode in episodeLinks:
-        #     item = Item()
-        #     item.name = episode
-        #     item.image = episode
-        #     item.description = episode
-        #     url = '{}?&action=getDirectLink&url={}'.format(_url, episode)
-        #     item.video = url
-        #     lib = ListItemBuilder.ListItemBuilder()
-        #     listItem = lib.buildListItemFromItem(item)
-        #     listItems.append((url, lib.buildListItemFromItem(item), False))
-
-        # _screen.setPluginCategory(_handle, 'All Episodes Of Series')
-        # _screen.setContent(_handle, 'videos')
-        # _screen.addDirectoryItems(_handle, listItems)
-        # _screen.endOfDirectory(_handle)
-
 
 def resolveAllEpisodesAndShow(url):
     episodesInfo = resolver.getAllEpisodesOfSeries(url)
@@ -79,7 +62,8 @@ def resolveAllEpisodesAndShow(url):
     _screen.setContent(_handle, 'videos')
     for episode in episodesInfo['episodes']:
         tr = toggle_resolver.ToggleResolver(episode['url'])
-        _screen.addDirectoryItem(_handle, tr.getVideoURL(), tr.buildListItem(), False)
+        _screen.addDirectoryItem(
+            _handle, tr.getVideoURL(), tr.buildListItem(), False)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 
@@ -105,6 +89,12 @@ def landing():
         # listItem.setArt({})
         listItem.setInfo(
             'video', {'title': series['title'], 'mediatype': 'video'})
+
+        listItem.setArt({
+            'thumb': series['imageURL'],
+            'icon': series['imageURL'],
+            'fanart': series['imageURL']
+        })
         isFolder = True
         # needs to become a tuple (url, listItem, isFolder)
         url = '{}?&action=getAllEpisodesOfSeries&url={}'.format(
