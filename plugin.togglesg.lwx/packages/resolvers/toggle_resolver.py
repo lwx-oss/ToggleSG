@@ -141,7 +141,7 @@ class ToggleResolver():
         '''
         item = Item()
         item.name = u'EP{} - {}'.format(self._getEpisodeNumber(),
-                                       self._getNameOfShow())
+                                        self._getNameOfShow())
         item.image = self._getHighestQualityPicture()
         item.description = self._getDescription()
         item.video = self._getHighestQualityVideoFile()
@@ -213,7 +213,6 @@ class ToggleResolver():
         return file['URL']
 
 
-
 class SeriesResolver(object):
     def __init__(self):
         self.contentId = None
@@ -226,7 +225,6 @@ class SeriesResolver(object):
         self.seriesURL = seriesUrl
         self.getIds()
         return self.getBlueprint()
-
 
     def getIds(self):
         r = requests.get(self.seriesURL)
@@ -255,7 +253,8 @@ class SeriesResolver(object):
             ('isCatchup', '1'),
         )
 
-        response = requests.get('https://tv.mewatch.sg/en/blueprint/servlet/toggle/paginate', headers=headers, params=params)
+        response = requests.get(
+            'https://tv.mewatch.sg/en/blueprint/servlet/toggle/paginate', headers=headers, params=params)
         content = response.content
 
         r = r'<a href=\"(https?.*ep\d+\/\d+)\"'
@@ -263,3 +262,21 @@ class SeriesResolver(object):
         # matches are all the episodes urls in an array, but contains duplicates
         normalized = list(set(matches))
         return normalized
+
+
+class SeriesInfoResolver(object):
+    def __init__(self):
+        pass
+
+    def resolveMetadata(self, seriesURL):
+        arr = seriesURL.split('/')
+        arr[-1] = 'info'
+        seriesURL = '/'.join(arr)
+        r = requests.get(seriesURL)
+        content = r.content
+        r = r'<img class=\"programinfo-item__banner\" src=\"(.*?)\" alt=\"(.*?)\">'
+        match = re.search(r, content)
+        imageURL = match.group(1)
+        seriesTitle = match.group(2)
+        imageURL = 'https://tv.mewatch.sg/' + imageURL
+        return {'image': imageURL, 'title': seriesTitle}

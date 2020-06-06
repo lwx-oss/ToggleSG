@@ -72,7 +72,7 @@ def resolveAllEpisodesLocally(seriesURL):
 
 
 def resolveAllEpisodesAndShow(url):
-    episodesInfo = resolver.getAllEpisodesOfSeries(url)
+    # episodesInfo = resolver.getAllEpisodesOfSeries(url)
     _screen.setPluginCategory(_handle, 'Episodes')
     _screen.setContent(_handle, 'videos')
     for episode in episodesInfo['episodes']:
@@ -99,16 +99,19 @@ def landing():
     listItems = []
 
     for series in allSeries:
+        tr = toggle_resolver.SeriesInfoResolver()
+        metadata = tr.resolveMetadata(series['url'])
+        imageURL = metadata['image']
         listItem = xbmcgui.ListItem()
-        listItem.setLabel(series['title'])
+        listItem.setLabel(metadata['title'])
         # listItem.setArt({})
         listItem.setInfo(
-            'video', {'title': series['title'], 'mediatype': 'video'})
+            'video', {'title': metadata['title'], 'mediatype': 'video'})
 
         listItem.setArt({
-            'thumb': series['imageURL'],
-            'icon': series['imageURL'],
-            'fanart': series['imageURL']
+            'thumb': imageURL,
+            'icon': imageURL,
+            'fanart': imageURL
         })
         isFolder = True
         # needs to become a tuple (url, listItem, isFolder)
