@@ -53,7 +53,22 @@ def router():
 
     elif action == 'getAllEpisodesOfSeries':
         url = d['url']
-        resolveAllEpisodesAndShow(url)
+        resolveAllEpisodesLocally(url)
+        # resolveAllEpisodesAndShow(url)
+
+
+def resolveAllEpisodesLocally(seriesURL):
+    tr = toggle_resolver.SeriesResolver()
+    episodes = tr.resolveSeriesToEpisoeds(seriesURL)
+    _screen.setPluginCategory(_handle, 'Episodes')
+    _screen.setContent(_handle, 'videos')
+    for episode in episodes:
+        tr = toggle_resolver.ToggleResolver(episode)
+        _screen.addDirectoryItem(
+            _handle, tr.getVideoURL(), tr.buildListItem(), False)
+    _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    _screen.endOfDirectory(_handle)
+
 
 
 def resolveAllEpisodesAndShow(url):

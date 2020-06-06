@@ -1,5 +1,6 @@
 import requests
 import xbmcgui
+import re
 
 
 class Item():
@@ -210,3 +211,55 @@ class ToggleResolver():
 
     def _mapFileToURL(self, file):
         return file['URL']
+
+
+
+class SeriesResolver(object):
+    def __init__(self):
+        self.contentId = None
+        self.navigationId = None
+        self.seriesURL = None
+        pass
+
+    def resolveSeriesToEpisoeds(self, seriesUrl):
+        ''' main driver '''
+        self.seriesURL = seriesUrl
+        self.getIds()
+        return self.getBlueprint()
+
+
+    def getIds(self):
+        r = requests.get(self.seriesURL)
+        content = r.content
+        r = r'\s(\d+), (\d+), isCatchup'
+        match = re.search(r, content)
+        contentId = match.group(1)
+        navigationId = match.group(2)
+        self.contentId = contentId
+        self.navigationId = navigationId
+
+    def getBlueprint(self):
+        ''' returns all episodes urls in an array '''
+        headers = {
+            'Accept': '*/*',
+            'Referer': self.seriesURL,
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+        }
+
+        params = (
+            ('pageSize', '1000'),
+            ('pageIndex', '0'),
+            ('contentId', self.contentId),
+            ('navigationId', self.navigationId),
+            ('isCatchup', '1'),
+        )
+
+        response = requests.get('https://tv.mewatch.sg/en/blueprint/servlet/toggle/paginate', headers=headers, params=params)
+        content = response.content
+
+        r = r'<a href=\"(https?.*ep\d+\/\d+)\"'
+        matches = re.findall(r, content)
+        # matches are all the episodes urls in an array, but contains duplicates
+        normalized = list(set(matches))
+        return normalized
