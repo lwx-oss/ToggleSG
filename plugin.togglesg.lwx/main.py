@@ -23,7 +23,7 @@ _screen = xbmcplugin
 
 _settings = xbmcaddon.Addon()
 
-LAZY_LOADING = True
+LAZY_LOADING = False
 
 
 def _getSetting(id):
@@ -187,6 +187,9 @@ def landingLazy():
 
 
 def main():
+    lazy_loading_value = _getSetting('lazy-loading')
+    LAZY_LOADING = lazy_loading_value == 'true'
+
     print("Main is hit")
     print("sys.argv", sys.argv)
     if sys.argv[2] != '':
