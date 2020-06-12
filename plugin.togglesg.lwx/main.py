@@ -23,8 +23,6 @@ _screen = xbmcplugin
 
 _settings = xbmcaddon.Addon()
 
-LAZY_LOADING = False
-
 
 def _getSetting(id):
     return _settings.getSetting(id)
@@ -61,12 +59,11 @@ def router():
 
     elif action == 'getAllEpisodesOfSeries':
         url = d['url']
-        if LAZY_LOADING:
+        if isLazyLoading():
             lazilyResolveAllEpisodesLocally(url)
         else:
             eagerlyResolveAllEpisodesLocally(url)
         # resolveAllEpisodesAndShow(url)
-
 
 
 
@@ -185,17 +182,17 @@ def landingLazy():
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 
+def isLazyLoading():
+    return _getSetting('lazy-loading') == 'true'
+
 
 def main():
-    lazy_loading_value = _getSetting('lazy-loading')
-    LAZY_LOADING = lazy_loading_value == 'true'
-
     print("Main is hit")
     print("sys.argv", sys.argv)
     if sys.argv[2] != '':
         router()
     else:
-        if LAZY_LOADING:
+        if isLazyLoading():
             landingLazy()
         else:
             landingEager()
