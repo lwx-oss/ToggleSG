@@ -227,7 +227,7 @@ class SeriesResolver(object):
         self.seriesURL = None
         pass
 
-    def resolveSeriesToEpisoeds(self, seriesUrl):
+    def resolveSeriesToEpisodes(self, seriesUrl):
         ''' main driver '''
         self.seriesURL = seriesUrl
         self.getIds()

@@ -72,7 +72,7 @@ def router():
 
 def lazilyResolveAllEpisodesLocally(seriesURL):
     tr = toggle_resolver.SeriesResolver()
-    episodes = tr.resolveSeriesToEpisoeds(seriesURL)
+    episodes = tr.resolveSeriesToEpisodes(seriesURL)
     _screen.setPluginCategory(_handle, 'Episodes')
     _screen.setContent(_handle, 'videos')
     for episode in episodes:
@@ -95,7 +95,7 @@ def lazilyResolveAllEpisodesLocally(seriesURL):
 
 def eagerlyResolveAllEpisodesLocally(seriesURL):
     tr = toggle_resolver.SeriesResolver()
-    episodes = tr.resolveSeriesToEpisoeds(seriesURL)
+    episodes = tr.resolveSeriesToEpisodes(seriesURL)
     _screen.setPluginCategory(_handle, 'Episodes')
     _screen.setContent(_handle, 'videos')
     for episode in episodes:
