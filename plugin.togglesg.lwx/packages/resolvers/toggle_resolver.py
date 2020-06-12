@@ -61,7 +61,6 @@ class ToggleResolver():
         return jsonResult
 
     def getSubtitlesResponse(self):
-
         headers = {
             'authority': 'sub.toggle.sg',
             'accept': 'application/json, text/javascript, */*; q=0.01',
@@ -78,10 +77,17 @@ class ToggleResolver():
             ('mediaId', self.mediaId),
         )
 
-        response = requests.get(
-            'https://sub.toggle.sg/toggle_api/v1.0/apiService/getSubtitleFilesForMedia', headers=headers, params=params)
+        jsonResult = []
 
-        jsonResult = response.json()
+        try:
+            response = requests.get(
+                'https://sub.toggle.sg/toggle_api/v1.0/apiService/getSubtitleFilesForMedia', headers=headers, params=params)
+
+            jsonResult = response.json()
+
+        except Exception:
+            print('Error fetching subtitles, might be due to requesting too frequently.')
+
 
         self.subtitlesResponse = jsonResult
 
