@@ -12,6 +12,7 @@ from packages.builders import ButtonBuilder
 from packages.builders import InputBuilder
 from packages.builders import ListItemBuilder
 from packages.resolvers import toggle_resolver, resolver
+from packages.constants import actions_constants
 
 _url = sys.argv[0]
 
@@ -49,7 +50,7 @@ def router():
     d = _transformQueryStringIntoDict(queryString)
     action = d['action']
 
-    if action == 'getDirectLink':
+    if action == actions_constants.GET_DIRECT_LINK:
         url = d['url']
         tr = toggle_resolver.ToggleResolver(url)
         item = tr.buildItemDTO()
@@ -57,7 +58,7 @@ def router():
         listItem.setSubtitles(item.subtitles)
         xbmcplugin.setResolvedUrl(_handle, True, listItem)
 
-    elif action == 'getAllEpisodesOfSeries':
+    elif action == actions_constants.GET_ALL_EPISODES_OF_SERIES:
         url = d['url']
         if isLazyLoading():
             lazilyResolveAllEpisodesLocally(url)
@@ -65,6 +66,8 @@ def router():
             eagerlyResolveAllEpisodesLocally(url)
         # resolveAllEpisodesAndShow(url)
 
+    elif action == actions_constants.GET_ALL_VIDEO_LINKS:
+        pass
 
 
 def lazilyResolveAllEpisodesLocally(seriesURL):
@@ -85,7 +88,7 @@ def lazilyResolveAllEpisodesLocally(seriesURL):
         listItem.setProperty('IsPlayable', 'true')
 
         _screen.addDirectoryItem(
-            _handle, '{}?&action=getDirectLink&url={}'.format(_url, episode), listItem, False)
+            _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_DIRECT_LINK, episode), listItem, False)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 
@@ -148,8 +151,8 @@ def landingEager():
         })
         isFolder = True
         # needs to become a tuple (url, listItem, isFolder)
-        url = '{}?&action=getAllEpisodesOfSeries&url={}'.format(
-            _url, series['url'])
+        url = '{}?&action={}&url={}'.format(
+            _url, actions_constants.GET_ALL_EPISODES_OF_SERIES, series['url'])
         listItems.append((url, listItem, isFolder))
 
     _screen.addDirectoryItems(_handle, listItems)
@@ -181,6 +184,7 @@ def landingLazy():
     _screen.addDirectoryItems(_handle, listItems)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
+
 
 def isLazyLoading():
     return _getSetting('lazy-loading') == 'true'
