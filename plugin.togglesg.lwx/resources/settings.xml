@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <category label="User Settings">
-        <setting label="Lazy loading" type="bool" id="lazy-loading" default="" />
+        <setting label="Lazy-loading" type="bool" id="lazy-loading" default="" />
+        <setting label="Auto Select Video Format" type="bool" id="auto-select-video-format" default="" />
     </category>
 </settings>

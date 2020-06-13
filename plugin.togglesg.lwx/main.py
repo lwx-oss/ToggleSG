@@ -110,10 +110,14 @@ def lazilyResolveAllEpisodesLocally(seriesURL):
             'mediatype': 'video'
         })
 
-        listItem.setProperty('IsPlayable', 'false')
-
-        _screen.addDirectoryItem(
-            _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_ALL_VIDEO_LINKS, episode), listItem, True)
+        if isAutoSelectVideoFormat():
+            listItem.setProperty('IsPlayable', 'true')
+            _screen.addDirectoryItem(
+                _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_DIRECT_LINK, episode), listItem, False)
+        else:
+            listItem.setProperty('IsPlayable', 'false')
+            _screen.addDirectoryItem(
+                _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_ALL_VIDEO_LINKS, episode), listItem, True)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 
@@ -125,8 +129,12 @@ def eagerlyResolveAllEpisodesLocally(seriesURL):
     _screen.setContent(_handle, 'videos')
     for episode in episodes:
         tr = toggle_resolver.ToggleResolver(episode)
-        _screen.addDirectoryItem(
-            _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_ALL_VIDEO_LINKS, episode), tr.buildListItem(), True)
+        if isAutoSelectVideoFormat():
+            _screen.addDirectoryItem(
+                _handle, tr.getVideoURL(), tr.buildListItem(), False)
+        else:
+            _screen.addDirectoryItem(
+                _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_ALL_VIDEO_LINKS, episode), tr.buildListItem(), True)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 
@@ -213,6 +221,9 @@ def landingLazy():
 
 def isLazyLoading():
     return _getSetting('lazy-loading') == 'true'
+
+def isAutoSelectVideoFormat():
+    return _getSetting('auto-select-video-format') == 'true'
 
 
 def main():
