@@ -65,9 +65,34 @@ def router():
         else:
             eagerlyResolveAllEpisodesLocally(url)
         # resolveAllEpisodesAndShow(url)
-
     elif action == actions_constants.GET_ALL_VIDEO_LINKS:
-        pass
+        url = d['url']
+        displayAllVideoLinksForSelection(url)
+        
+
+
+def displayAllVideoLinksForSelection(url):
+    _screen.setPluginCategory(_handle, 'Select Video Format')
+    _screen.setContent(_handle, 'videos')
+
+    tr = toggle_resolver.ToggleResolver(url)
+    item = tr.buildItemDTO()
+
+    listItems = []
+
+    for video in item.videos:
+            # needs to be a tuple (url, listItem, isFolder)
+        listItem = xbmcgui.ListItem()
+        listItem.setLabel(video['format'])
+        listItem.setInfo('video', {'title': video['format'], 'mediatype': 'video'})
+        isFolder = False # we want to play the actual video link
+        listItem.setProperty('IsPlayable', 'true')
+        listItem.setSubtitles(item.subtitles)
+        listItems.append((video['url'], listItem, isFolder))
+    
+    _screen.addDirectoryItems(_handle, listItems)
+    _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    _screen.endOfDirectory(_handle)
 
 
 def lazilyResolveAllEpisodesLocally(seriesURL):
@@ -85,10 +110,10 @@ def lazilyResolveAllEpisodesLocally(seriesURL):
             'mediatype': 'video'
         })
 
-        listItem.setProperty('IsPlayable', 'true')
+        listItem.setProperty('IsPlayable', 'false')
 
         _screen.addDirectoryItem(
-            _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_DIRECT_LINK, episode), listItem, False)
+            _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_ALL_VIDEO_LINKS, episode), listItem, True)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 
@@ -101,7 +126,7 @@ def eagerlyResolveAllEpisodesLocally(seriesURL):
     for episode in episodes:
         tr = toggle_resolver.ToggleResolver(episode)
         _screen.addDirectoryItem(
-            _handle, tr.getVideoURL(), tr.buildListItem(), False)
+            _handle, '{}?&action={}&url={}'.format(_url, actions_constants.GET_ALL_VIDEO_LINKS, episode), tr.buildListItem(), True)
     _screen.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     _screen.endOfDirectory(_handle)
 

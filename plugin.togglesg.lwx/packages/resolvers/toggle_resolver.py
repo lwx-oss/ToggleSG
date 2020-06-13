@@ -127,6 +127,7 @@ class ToggleResolver():
 
         item = Item()
         item.video = videoURL
+        item.videos = self._getAllVideoURLs()
         # item.shortTitle = shortTitle
         item.image = imageURL
         # item.epNo = epNo
@@ -171,6 +172,27 @@ class ToggleResolver():
         listItem.setSubtitles(self._getAllSubtitles())
 
         return listItem
+
+    def _getAllVideoURLs(self):
+        files = []
+        for file in self.episodeResponse['Files']:
+            fileId = file['FileID']
+            url = file['URL']
+            duration = file['Duration']
+            format = file['Format']
+            language = file['Language']
+            # most likely we only want url and format
+            d = {
+                'fileId': fileId,
+                'url': url,
+                'duration': duration,
+                'format': format,
+                'language': language
+            }
+            files.append(d)
+        return files
+
+        
 
     def getVideoURL(self):
         self.video = self._getHighestQualityVideoFile()
