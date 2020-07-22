@@ -219,8 +219,13 @@ def landingLazy():
     _screen.endOfDirectory(_handle)
 
 
+def isLazyLanding():
+    return _getSetting('lazy-landing') == 'true'
+
+
 def isLazyLoading():
     return _getSetting('lazy-loading') == 'true'
+
 
 def isAutoSelectVideoFormat():
     return _getSetting('auto-select-video-format') == 'true'
@@ -232,7 +237,7 @@ def main():
     if sys.argv[2] != '':
         router()
     else:
-        if isLazyLoading():
+        if isLazyLanding():
             landingLazy()
         else:
             landingEager()

@@ -305,7 +305,12 @@ class SeriesInfoResolver(object):
         content = r.content
         r = r'<img class=\"programinfo-item__banner\" src=\"(.*?)\" alt=\"(.*?)\">'
         match = re.search(r, content)
-        imageURL = match.group(1)
-        seriesTitle = match.group(2)
-        imageURL = 'https://tv.mewatch.sg/' + imageURL
+        imageURL = ''
+        seriesTitle = arr[7] # default if fail to parse from regex
+        try:
+            imageURL = match.group(1)
+            seriesTitle = match.group(2)
+            imageURL = 'https://tv.mewatch.sg/' + imageURL
+        except Exception as e:
+            print('[ERROR] resolveMetadata() for {} failed.'.format(seriesURL))
         return {'image': imageURL, 'title': seriesTitle}
