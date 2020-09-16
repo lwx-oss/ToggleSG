@@ -56,6 +56,13 @@ class ToggleResolver():
 
         jsonResult = response.json()
 
+        while 'Error' in jsonResult:
+            response = requests.post(
+            'https://tvpapi-as.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx', headers=headers, params=params, data=data)
+
+            jsonResult = response.json()
+
+
         self.episodeResponse = jsonResult
 
         return jsonResult
